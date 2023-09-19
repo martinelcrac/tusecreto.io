@@ -9,7 +9,7 @@ intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix='!', intents=intents)
 
-msg = '.gg/z15 | .gg/z15 | .gg/z15 | .gg/z15'
+msg = 'hola mundo =)'
 is_nsfw = False
 gender = 'male'
 access_token = ''
@@ -40,6 +40,36 @@ async def send_message():
     print(response.status_code)
     print(response.content)
     await asyncio.sleep(5)  # Use asyncio sleep for asynchronous behavior
+
+spam_loop_task = None  # Variable para almacenar la tarea de spam en bucle
+loop_interval = 0  # Tiempo en segundos entre cada envío del mensaje
+
+# ... (resto del código) ...
+
+@bot.command()
+async def start_spam_loop(ctx):
+    global spam_loop_task
+    if spam_loop_task and not spam_loop_task.done():
+        await ctx.send('El spam en bucle ya está en ejecución.')
+    else:
+        spam_loop_task = bot.loop.create_task(spam_loop_messages(ctx))
+        await ctx.send('Spam en bucle iniciado.')
+
+@bot.command()
+async def stop_spam_loop(ctx):
+    global spam_loop_task
+    if spam_loop_task and not spam_loop_task.done():
+        spam_loop_task.cancel()
+        await ctx.send('Spam en bucle detenido.')
+    else:
+        await ctx.send('No hay un bucle de spam en ejecución.')
+
+async def spam_loop_messages(ctx):
+    while True:
+        global is_nsfw
+        is_nsfw = not is_nsfw  # Alternamos entre NSFW activado y desactivado
+        await send_message()
+        await asyncio.sleep(loop_interval)
 
 @bot.event
 async def on_ready():
